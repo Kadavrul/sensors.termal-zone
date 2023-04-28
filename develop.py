@@ -55,19 +55,44 @@ if __name__ == "__main__":
                 def main(stdscr):
                     # Устанавливаем флаги для работы с цветом
                     curses.start_color()
-                    curses.use_default_colors()
+                    # curses.use_default_colors()
+                    stdscr.keypad(True)
 
                     # Устанавливаем цвет фона и текста для всех ячеек
-                    curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_WHITE)
+                    curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLACK)
+                    curses.init_pair(2, curses.COLOR_MAGENTA,
+                                     curses.COLOR_BLACK)
+
                     stdscr.bkgd(curses.color_pair(1))
 
                     # Разделяем экран на 4 части
+                    # Получаем размер экрана
                     h, w = stdscr.getmaxyx()
-                    left_top = curses.newwin(h//2, w//2, 0, 0)
-                    left_bottom = curses.newwin(h-h//2, w//2, h//2, 0)
-                    right_top = curses.newwin(h//2, w-w//2, 0, w//2)
-                    right_bottom = curses.newwin(h-h//2, w-w//2, h//2, w//2)
 
+                    # Разделяем экран на 4 части
+                    left_top = stdscr.subwin(h//2 - 1, w//2 - 1, 1, 1)
+                    left_bottom = stdscr.subwin(
+                        h - h//2 - 1, w//2 - 1, h//2 + 1, 1)
+                    right_top = stdscr.subwin(
+                        h//2 - 1, w - w//2 - 1, 1, w//2 + 1)
+                    right_bottom = stdscr.subwin(
+                        h - h//2 - 1, w - w//2 - 1, h//2 + 1, w//2 + 1)
+
+                    # Красим окна
+                    left_top.bkgd(curses.color_pair(2))
+                    left_bottom.bkgd(curses.color_pair(2))
+                    right_top.bkgd(curses.color_pair(2))
+                    right_bottom.bkgd(curses.color_pair(2))
+                    # Box win
+                    left_top.attron(curses.color_pair(2))
+                    left_bottom.attron(curses.color_pair(2))
+                    right_top.attron(curses.color_pair(2))
+                    right_bottom.attron(curses.color_pair(2))
+                    # Border win
+
+                    # Обновляем экран, чтобы изменения стали видимыми
+                    curses.doupdate()
+                    # curses.doupdate()
                     # Выводим текст в каждую часть экрана
 
                     cpu_percent = psutil.cpu_percent()
@@ -78,13 +103,14 @@ if __name__ == "__main__":
                         0].current
                     cpu_load_avg = psutil.getloadavg()
 
-                    left_top.addstr(f"{'-'*30}\n{' '*10}CPU INFO\n{'-'*30}\n")
-                    left_top.addstr(f"CPU usage: {cpu_percent}%\n")
-                    left_top.addstr(f"CPU frequency: {cpu_freq} GHz\n")
-                    left_top.addstr(f"CPU cores: {cpu_cores}\n")
-                    left_top.addstr(f"CPU threads: {cpu_threads}\n")
-                    left_top.addstr(f"CPU temperature: {cpu_temp}°C\n")
-                    left_top.addstr(f"CPU load average: {cpu_load_avg}\n")
+                    left_top.addstr(
+                        f"\n{' '*10}CPU INFO\n{'-'*int(w/2-1)}\n")
+                    left_top.addstr(f" CPU usage: {cpu_percent}%\n")
+                    left_top.addstr(f" CPU frequency: {cpu_freq} GHz\n")
+                    left_top.addstr(f" CPU cores: {cpu_cores}\n")
+                    left_top.addstr(f" CPU threads: {cpu_threads}\n")
+                    left_top.addstr(f" CPU temperature: {cpu_temp}°C\n")
+                    # left_top.addstr(f" CPU load average: {cpu_load_avg}\n")
 
                     total, used, free = shutil.disk_usage("/")
                     total = total / (1024**3)
@@ -92,24 +118,26 @@ if __name__ == "__main__":
                     free = free / (1024**3)
 
                     left_bottom.addstr(
-                        f"{'-'*30}\n{' '*12}DISK INFO\n{'-'*30}\n")
+                        f"\n{' '*10}DISK INFO\n{'-'*int(w/2-1)}\n")
                     left_bottom.addstr(
-                        f"Total: {total:.2f} GB |\n Used: {used:.2f} GB |\n Free: {free:.2f} GB\n")
+                        f" Total: {total:.2f} GB |\n Used: {used:.2f} GB |\n Free: {free:.2f} GB\n")
 
                     mem = psutil.virtual_memory()
                     total_mem = round(mem.total / (1024 ** 3), 2)
                     used_mem = round(mem.used / (1024 ** 3), 2)
                     free_mem = round(mem.available / (1024 ** 3), 2)
 
+                    # win_name = "MEMORY USAGE"
                     right_top.addstr(
-                        f"{'-'*30}\n{' '*10}MEMORY USAGE\n{'-'*30}\n")
-                    right_top.addstr(f"Total Memory:\t\t{total_mem} GB\n")
-                    right_top.addstr(f"Used Memory:\t\t{used_mem} GB\n")
-                    right_top.addstr(f"Free Memory:\t\t{free_mem} GB\n")
-                    right_top.addstr(f"Memory Utilization:\t{mem.percent}%\n")
+                        f"\n{' '*10}MEMORY USAGE\n{'-'*int(w/2-1)}\n")
+                    # right_top.addstr(f"\n {'-'*30}\n{' '*10}MEMORY USAGE\n{'-'*30}\n")
+                    right_top.addstr(f" Total Memory:\t\t{total_mem} GB\n")
+                    right_top.addstr(f" Used Memory:\t\t{used_mem} GB\n")
+                    right_top.addstr(f" Free Memory:\t\t{free_mem} GB\n")
+                    right_top.addstr(f" Memory Utilization:\t{mem.percent}%\n")
 
                     right_bottom.addstr(
-                        f"{'-'*30}\n{' '*10}TEMP INFO\n{'-'*30}\n")
+                        f"\n{' '*10}TEMP INFO\n{'-'*int(w/2-1)}\n")
                     # Получаем вывод команды sensors для термальных зон
                     sensors_output = subprocess.check_output(
                         ['sensors']).decode('utf-8')
@@ -128,17 +156,17 @@ if __name__ == "__main__":
                     # Выводим температуры термальных зон для отладки
                     # print("Текущие температуры термальных зон:")
                     right_bottom.addstr(
-                        "Текущие температуры термальных зон:\n")
+                        " Текущие температуры термальных зон:\n")
                     for zone, temperature in temperatures.items():
                         # print(f"{zone}: {temperature}°C")
-                        right_bottom.addstr(f"{zone}: {temperature}°C\n")
+                        right_bottom.addstr(f" {zone}: {temperature}°C\n")
 
                     # Возвращаем среднюю температуру всех термальных зон
                     # return sum(temperatures.values()) / len(temperatures)
                     temperature = sum(temperatures.values()
                                       ) / len(temperatures)
                     right_bottom.addstr(
-                        f"Текущая температура: {temperature}°C\n")
+                        f" Текущая температура: {temperature}°C\n")
                 # Если температура больше 85 градусов Цельсия, выводим уведомление
                     if temperature > 85:
                         os.system(
@@ -148,6 +176,10 @@ if __name__ == "__main__":
                         # Отображаем изменения на экране
 
                     # stdscr.refresh()
+                    left_top.box()
+                    left_bottom.box()
+                    right_top.box()
+                    right_bottom.box()
                     left_top.refresh()
                     left_bottom.refresh()
                     right_top.refresh()
