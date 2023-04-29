@@ -32,8 +32,9 @@ def say_hello():
     print(greeting)
     greetings1 = [
         # './jarvis-halo_2.wav',
-        './jarvis-halo.wav',
-        'jarvis-halo_1.wav',
+        # './audio/jarvis-halo.wav',
+        # './audio/jarvis-halo_1.wav',
+        './audio/hello_user.mp3',
 
     ]
     greeting1 = random.choice(greetings1)
@@ -42,8 +43,31 @@ def say_hello():
     time.sleep(5)
 
 
+def hello_art(stdscr):
+    # Устанавливаем настройки экрана
+    curses.curs_set(0)
+    stdscr.clear()
+    stdscr.refresh()
+
+    # Получаем размер экрана
+    height, width = stdscr.getmaxyx()
+
+    # Создаем новое окно на всю ширину и высоту экрана
+    win = curses.newwin(height, width, 0, 0)
+
+    # Отображаем текстовый арт в окне
+    art = "   ▄▄▄▄▄ ▀▄    ▄  ▄▄▄▄▄      ▄▄▄▄▀ ▄███▄   █▀▄▀█\n  █     ▀▄ █  █  █     ▀▄ ▀▀▀ █    █▀   ▀  █ █ █\n▄  ▀▀▀▀▄    ▀█ ▄  ▀▀▀▀▄       █    ██▄▄    █ ▄ █\n ▀▄▄▄▄▀     █   ▀▄▄▄▄▀       █     █▄   ▄▀ █   █\n          ▄▀                ▀      ▀███▀      █ \n                                             ▀  \n\n\n █▀▄▀█ ████▄    ▄   ▄█    ▄▄▄▄▀ ████▄ █▄▄▄▄ ▄█    ▄     ▄▀ \n █ █ █ █   █     █  ██ ▀▀▀ █    █   █ █  ▄▀ ██     █  ▄▀   \n █ ▄ █ █   █ ██   █ ██     █    █   █ █▀▀▌  ██ ██   █ █ ▀▄ \n █   █ ▀████ █ █  █ ▐█    █     ▀████ █  █  ▐█ █ █  █ █   █\n    █        █  █ █  ▐   ▀              █    ▐ █  █ █  ███ \n   ▀         █   ██                    ▀       █   ██      \n\n  ▄ ▄   ▄█    ▄▄▄▄▀ ▄  █     ██          ▄▄▄▄▄   █▀▄▀█ ▄█ █     ▄███▄   \n █   █  ██ ▀▀▀ █   █   █     █ █        █     ▀▄ █ █ █ ██ █     █▀   ▀  \n█ ▄   █ ██     █   ██▀▀█     █▄▄█     ▄  ▀▀▀▀▄   █ ▄ █ ██ █     ██▄▄   \n█  █  █ ▐█    █    █   █     █  █      ▀▄▄▄▄▀    █   █ ▐█ ███▄  █▄   ▄▀\n █ █ █   ▐   ▀        █         █                   █   ▐     ▀ ▀███▀  \n  ▀ ▀                ▀         █                   ▀                   \n\n________________________________________________________________________\n\n _________        .------------------.              \n:______.-':      :  .--------------.  :             \n| ______  |      | :                : |             \n|:______B:|      | |  Little Error: | |             \n|:______B:|      | |                | |             \n|:______B:|      | |  critical      | |             \n|         |      | |  temperature.  | |             \n|:_____:  |      | |                | |             \n|    ==   |      | :                : |             \n|       O |      :  '--------------'  :             \n|       o |      :'---...______...---'              \n|       o |-._.-i___/'             \._              \n|'-.____o_|   '-.   '-...______...-'  `-._          \n:_________:      `.____________________   `-.___.-. \n                 .'.eeeeeeeeeeeeeeeeee.'.      :___:\n    Daemon     .'.eeeeeeeeeeeeeeeeeeeeee.'.         \n              :____________________________:        \n"
+    win.addstr(0, 0, art)
+
+    # Обновляем экран и ждем 5 секунд
+    win.refresh()
+    time.sleep(5)
+    curses.doupdate()
+
+
 if __name__ == "__main__":
     say_hello()
+    curses.wrapper(hello_art)
     try:
         # say_hello() ACTIVATE
         # keyboard.add_hotkey('ctrl+c', on_ctrl_c_pressed)
@@ -91,7 +115,7 @@ if __name__ == "__main__":
                     # Border win
 
                     # Обновляем экран, чтобы изменения стали видимыми
-                    curses.doupdate()
+                    # curses.doupdate()
                     # curses.doupdate()
                     # Выводим текст в каждую часть экрана
 
@@ -171,8 +195,11 @@ if __name__ == "__main__":
                     if temperature > 85:
                         os.system(
                             'notify-send "Внимание! Температура превысила 85 градусов!"')
-                        sound_file_path_halo = './bell.mp3'
+                        sound_file_path_halo = './audio/bell.mp3'
                         play_sound(sound_file_path_halo)
+                        sound_file_path_halo = './audio/critical_temp.mp3'
+                        play_sound(sound_file_path_halo)
+
                         # Отображаем изменения на экране
 
                     # stdscr.refresh()
@@ -189,7 +216,7 @@ if __name__ == "__main__":
                     time.sleep(3)
 
                 def on_ctrl_c_pressed(e):
-                    sound_file_path = './jarvis_kak-pojelaete.wav'
+                    sound_file_path = './audio/exit.mp3'
                     play_sound(sound_file_path)
                     # Здесь можете добавить логику завершения программы
                     time.sleep(2)
